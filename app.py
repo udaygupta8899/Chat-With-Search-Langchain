@@ -3,7 +3,8 @@ from langchain_groq import ChatGroq
 from langchain_community.utilities import ArxivAPIWrapper,WikipediaAPIWrapper
 from langchain_community.tools import ArxivQueryRun,WikipediaQueryRun,DuckDuckGoSearchRun
 from langchain.agents import initialize_agent,AgentType
-from langchain.callbacks import StreamlitCallbackHandler
+from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
+
 import os
 from dotenv import load_dotenv
 
@@ -23,7 +24,7 @@ st.title("Chat with search --Langchain")
 # st.sidebar.title("Settings")
 # api_key=st.sidebar.text_input("Enter your Groq API Key:",type="password")
 # load_dotenv()
-api_key=st.secrets['GROQ_API_KEY']
+api_key=os.getenv('GROQ_API_KEY')
 
 if "messages" not in st.session_state:
     st.session_state["messages"]=[
@@ -40,7 +41,7 @@ if prompt:=st.chat_input(placeholder="What is Machine Learning"):
     llm=ChatGroq(groq_api_key=api_key,model_name="Llama3-8b-8192",streaming=True)
     tools=[search,arxiv,wiki]
 
-    search_agent=initialize_agent(tools,llm,agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,handling_parsing_errors=True)
+    search_agent=initialize_agent(tools,llm,agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,handle_parsing_errors=True)
     
     with st.chat_message("assistant"):
         st_cb=StreamlitCallbackHandler(st.container(),expand_new_thoughts=False)
